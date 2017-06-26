@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <title>mysql</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th colspan="2">INSERT USER</th>
+    </tr>
+    <tr>
+        <td>Enter name:</td>
+        <td><input type="text" id="name"></td>
+    </tr>
+    <tr>
+        <td>Enter age: </td>
+        <td><input type="number" id="age"></td>
+    </tr>
+    <tr>
+        <td colspan="2"><button id="btn-insert">Submit</button></td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th colspan="2">FIND USER</th>
+    </tr>
+    <tr>
+        <td>Enter id:</td>
+        <td><input type="number" id="id"></td>
+    </tr>
+    <tr>
+        <td><button id="btn-find">Submit</button></td>
+        <td><button id="btn-find-all">Get All</button></td>
+    </tr>
+</table>
+
+<div id="results"></div>
+
+<script>
+    var resultsBox = $('#results');
+    var printResults = (dataToPrint) => {
+        resultsBox.empty();
+        for(var i=0; i<dataToPrint.length; i++){
+            var div = $('<div>' + dataToPrint[i].name + '</div>');
+            resultsBox.append(div);
+        }
+    };
+    $('#btn-insert').click(() => {
+        var user = {};
+        user.name = $('#name').val();
+        user.age = $('#age').val();
+        $.ajax({
+            url: `http://localhost:3500/user`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(user),
+            success: () => {
+                $('#name').val("");
+                $('#age').val("");
+            },
+            error: () => {
+                console.log('Unable to send request');
+            }
+        });
+    });
+    $('#btn-find').click(() => {
+        var id = $('#id').val();
+        $.ajax({
+            url: `http://localhost:3500/users/${id}`,
+            type: 'GET',
+            success: (data) => {
+                $('#id').val("");
+                printResults(data);
+            },
+            error: () => {
+                console.log('Unable to send request');
+            }
+        });
+    });
+    $('#btn-find-all').click(() => {
+        $.ajax({
+            url: 'http://localhost:3500/users',
+            type: 'GET',
+            success: (data) => {
+                printResults(data);
+            },
+            error: () => {
+                console.log('Unable to send request');
+            }
+        });
+    });
+</script>
+</body>
+</html>
